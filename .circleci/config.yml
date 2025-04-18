@@ -25,8 +25,7 @@ jobs:
           echo "Running tests..."
           npm run test
   publish:
-    docker:
-      - image: cimg/node:16.10
+    executor: docker/docker
     steps:
       - setup_remote_docker
       - checkout
@@ -51,10 +50,10 @@ jobs:
       - run:
           name: Heroku Container Push
           command: | 
-              heroku container:login
-              heroku stack:set container -a $HEROKU_APP_NAME
-              heroku container:push web -a $HEROKU_APP_NAME
-              heroku container:release web -a $HEROKU_APP_NAME
+            heroku container:login
+            heroku stack:set container -a $HEROKU_APP_NAME
+            heroku container:push web -a $HEROKU_APP_NAME
+            heroku container:release web -a $HEROKU_APP_NAME
 workflows:
   simple_workflow:
     jobs:

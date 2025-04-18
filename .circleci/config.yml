@@ -30,16 +30,31 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
+      - docker/check:
+          docker-username: DOCKERHUB_LOGIN
+          docker-password: DOCKERHUB_PASSWORD
       - run:
           name: Docker Login
           command: |
             echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_LOGIN --password-stdin
+      - docker/build:
+          image: lukemoovita/test_repository
+      - docker/push:
+          image: lukemoovita/test_repository
+  deploy:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - setup_remote_docker
+      - heroku/install
+      - checkout
       - run:
-          name: Build Docker Image
-          command: docker build -t lukemoovita/test_repository .
-      - run:
-          name: Push Docker Image
-          command: docker push lukemoovita/test_repository
+          name: Heroku Container Push
+          command: | 
+              heroku container:login
+              heroku stack:set container -a $HEROKU_APP_NAME
+              heroku container:push web -a $HEROKU_APP_NAME
+              heroku container:release web -a $HEROKU_APP_NAME
 workflows:
   simple_workflow:
     jobs:
@@ -50,3 +65,6 @@ workflows:
       - publish:
           requires:
             - test
+      - deploy:
+          requires:
+            - publish

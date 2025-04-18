@@ -40,22 +40,20 @@ jobs:
           image: lukemoovita/test_repository
       - docker/push:
           image: lukemoovita/test_repository
-    
-    deploy:
-      docker:
-        - image: cimg/node:16.10
-      steps:
-        - setup_remote_docker      
-        - heroku/install
-        - checkout
-        - run:
-            name: Heroku Container Push
-            command: | 
-                heroku container:login
-                heroku stack:set container -a $HEROKU_APP_NAME
-                heroku container:push web -a $HEROKU_APP_NAME
-                heroku container:release web -a $HEROKU_APP_NAME
-
+  deploy:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - setup_remote_docker
+      - heroku/install
+      - checkout
+      - run:
+          name: Heroku Container Push
+          command: | 
+            heroku container:login
+            heroku stack:set container -a $HEROKU_APP_NAME
+            heroku container:push web -a $HEROKU_APP_NAME
+            heroku container:release web -a $HEROKU_APP_NAME
 workflows:
   simple_workflow:
     jobs:

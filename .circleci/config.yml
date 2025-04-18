@@ -24,34 +24,22 @@ jobs:
       - run: |
           echo "Running tests..."
           npm run test
-  
   publish:
     executor: docker/docker
     steps:
       - setup_remote_docker
       - checkout
       - docker/check:
-          docker-username: DOCKERHUB_LOGIN  # DOCKER_LOGIN is the default value, if it exists, it automatically would be used.
-          docker-password: DOCKERHUB_PASSWORD  # DOCKER_PASSWORD is the default value
-      - docker/build:
-          image: wongshennan/test_repository
-      - docker/push:
-          image: wongshennan/test_repository
-  deploy:
-    docker:
-      - image: cimg/node:16.10
-    steps:
-      - setup_remote_docker      
-      - heroku/install
-      - checkout
+          docker-username: DOCKERHUB_LOGIN
+          docker-password: DOCKERHUB_PASSWORD
       - run:
-          name: Heroku Container Push
-          command: | 
-              heroku container:login
-              heroku stack:set container -a shennan-su-devops
-              heroku container:push web -a shennan-su-devops
-              heroku container:release web -a shennan-su-devops
-
+          name: Docker Login
+          command: |
+            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_LOGIN --password-stdin
+      - docker/build:
+          image: lukemoovita/test_repository
+      - docker/push:
+          image: lukemoovita/test_repository
 workflows:
   simple_workflow:
     jobs:
@@ -62,6 +50,3 @@ workflows:
       - publish:
           requires:
             - test
-      - deploy:
-          requires:
-            - publish

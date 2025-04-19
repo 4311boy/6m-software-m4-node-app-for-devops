@@ -60,4 +60,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: luketanmoovita/test_repository:latest # Tags the Docker image
+          tags: lukemoovita/test_repository:latest # Tags the Docker image
